@@ -1,0 +1,32 @@
+{
+  "name": "dglab-coyote-link",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CoyoteLink - unofficial DG-LAB Socket V4 mutual-control web app with rooms, +/-1 intensity control, custom waveforms and touch mode",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "GPL-3.0-only",
+  "author": "sunzhaocn",
+  "homepage": "https://github.com/sunzhaocn/dglab-coyote-link#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunzhaocn/dglab-coyote-link.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sunzhaocn/dglab-coyote-link/issues"
+  },
+  "keywords": [
+    "dglab",
+    "coyote",
+    "socket-v4",
+    "websocket",
+    "mutual-control",
+    "waveform",
+    "touch-control"
+  ]
+}

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="theme-color" content="#0c0d0e" />
+<title>CoyoteLink · 郊狼互控</title>
+<style>
+:root{--bg:#0b0c0d;--panel:#151719;--panel2:#1b1d20;--line:#2b2e32;--gold:#e9c76e;--muted:#90949a;--text:#f3f3f2;--ok:#64d58b;--danger:#ff675f;--shadow:0 18px 60px rgba(0,0,0,.28)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}html,body{touch-action:pan-y;overscroll-behavior-y:none}body{margin:0;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:radial-gradient(circle at 50% -10%,#23211b 0,#0b0c0d 34%,#090a0b 100%);color:var(--text);font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;min-height:100vh}button,input{font:inherit}input,textarea{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}img{user-select:none;-webkit-user-select:none;-webkit-user-drag:none;user-drag:none;-webkit-touch-callout:none}.app{max-width:680px;margin:0 auto;min-height:100vh;padding:16px 14px 96px}.top{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 16px}.brand{display:flex;gap:10px;align-items:center}.logo{width:38px;height:38px;border:1px solid #685b30;border-radius:12px;display:grid;place-items:center;color:var(--gold);background:#111}.brand h1{font-size:16px;margin:0}.brand small{display:block;color:var(--muted);margin-top:2px}.dot{width:9px;height:9px;border-radius:50%;background:#555;box-shadow:0 0 0 4px rgba(255,255,255,.03)}.dot.on{background:var(--ok);box-shadow:0 0 18px rgba(100,213,139,.65)}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid #282a2e;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}.row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.muted{color:var(--muted)}.gold{color:var(--gold)}.tiny{font-size:12px}.title{font-size:13px;font-weight:700;letter-spacing:.04em}.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border-radius:999px;background:#101214;border:1px solid #2a2d30;color:#b9bdc2;font-size:12px}.room{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px;align-items:stretch}.room-actions{display:flex;gap:7px}.room-actions .btn{white-space:nowrap;min-width:92px}.input{width:100%;background:#0d0f10;border:1px solid #313439;border-radius:11px;color:#fff;padding:12px}.btn{border:0;border-radius:11px;padding:12px 14px;font-weight:700;cursor:pointer}.btn.gold{background:var(--gold);color:#18150c}.btn.ghost{background:#202327;color:#eee;border:1px solid #30343a}.btn.danger{background:#3a1717;color:#ffd9d6;border:1px solid #7b2b2b}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.fieldhint{font-size:11px;color:var(--muted);margin:7px 2px 0}.fieldhint.error{color:#ff8d86}
+.device-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.device{padding:12px;border-radius:13px;background:#101214;border:1px solid #292c30}.device strong{font-size:13px}.device .value{font-size:32px;line-height:1;margin:10px 0 6px}.unit{font-size:11px;color:var(--muted)}.socketbox{margin-top:12px;padding:12px;border:1px solid #303337;border-radius:14px;background:#0f1112}.qrgrid{display:grid;grid-template-columns:196px minmax(0,1fr);gap:28px;align-items:start;margin-top:12px}.qr{width:180px;height:180px;border-radius:12px;background:#fff;padding:8px;overflow:hidden}.qr img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.qrgrid>div:last-child{min-width:0;padding-top:4px}.qrgrid>div:last-child>.title{margin-bottom:10px;font-size:14px}.manual-connect{margin-top:14px}.manual-connect .input{font-size:11px;padding:10px}.mono{font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all;color:#b6bbc0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.actions .btn{padding:9px 11px;font-size:12px;text-decoration:none}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#101214;border-radius:12px;padding:5px;margin-bottom:12px}.tab{padding:10px;border:0;border-radius:9px;background:transparent;color:#9ea2a7;font-weight:700}.tab.active{background:var(--gold);color:#18150c}.hold-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.channel-control{border:1px solid #3a3d42;border-radius:16px;background:linear-gradient(180deg,#17191b,#101214);padding:12px 10px;min-width:0}.hold-letter{font-size:14px;font-weight:900;color:var(--gold);letter-spacing:.08em;text-align:center}.channel-main{display:grid;grid-template-columns:58px minmax(0,1fr) 58px;gap:8px;align-items:center;margin-top:10px}.hold-step{height:72px;border:1px solid #3a3d42;border-radius:14px;background:#101214;color:#fff;font-size:32px;font-weight:900;line-height:1;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}.hold-step.inc{color:var(--gold)}.hold-step.dec{color:#d7d9dc}.hold-step:active,.hold-step.holding{border-color:var(--gold);box-shadow:0 0 0 2px rgba(231,199,109,.15) inset;background:#25231b}.hold-step:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}.hold-value{font-variant-numeric:tabular-nums;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}.hold-value b{font-size:38px;line-height:1}.hold-value small{font-size:12px;color:var(--muted);margin-top:5px;white-space:nowrap}.hold-tip{font-size:10px;color:var(--muted);text-align:center;margin-top:8px}.hold-help{text-align:center;font-size:11px;color:var(--muted);margin-top:9px}.waves{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.wave{border:1px solid #35383c;background:#111315;color:#d6d7d8;border-radius:11px;padding:10px 4px;min-height:62px}.wave.active{background:#e7c76d;color:#1d190e;border-color:#e7c76d}.wave b{display:block;font-size:21px;line-height:1.1}.wave span{font-size:10px}.switch{position:relative;width:48px;height:28px}.switch input{display:none}.switch i{position:absolute;inset:0;background:#34373b;border-radius:99px;transition:.2s}.switch i:after{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+i{background:var(--gold)}.switch input:checked+i:after{transform:translateX(20px);background:#1b1b18}.limits{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.limitbox{padding:10px;border:1px solid #303337;border-radius:11px;background:#0f1112}.limitbox label{display:block;font-size:11px;color:var(--muted);margin-bottom:7px}.limitbox input{width:100%;background:transparent;border:0;color:#fff;font-size:20px;outline:none}.notice{font-size:12px;line-height:1.55;color:#b4b7bb;border-left:3px solid #665a31;padding-left:10px;margin-top:10px}.estop{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(562px,calc(100% - 28px));height:58px;border-radius:16px;border:1px solid #8e332f;background:linear-gradient(180deg,#4a1c19,#321311);color:#ffd9d6;font-weight:900;letter-spacing:.12em;box-shadow:0 12px 35px rgba(0,0,0,.5);z-index:20}.statusline{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.log{max-height:140px;overflow:auto;background:#0c0e0f;border-radius:10px;padding:9px;font:11px/1.5 ui-monospace,monospace;color:#8f9498}.hidden{display:none!important}@media(max-width:500px){.qrgrid{grid-template-columns:1fr;gap:14px;align-items:center}.qrgrid>div:last-child{padding-top:0}.qr{width:min(72vw,240px);height:min(72vw,240px);margin:auto}.manual-connect{margin-top:12px}.app{padding-left:10px;padding-right:10px}.card{padding:12px}}
+
+.wave-workbench{margin-top:12px}.subtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#101214;border-radius:11px;padding:4px;margin-bottom:10px}.subtab{border:0;border-radius:8px;background:transparent;color:#9da1a7;padding:9px;font-weight:800}.subtab.active{background:#26231b;color:var(--gold)}.wavepanel{display:none}.wavepanel.active{display:block}.toolrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.toolrow .input{flex:1;min-width:120px}.filepick{position:relative;overflow:hidden}.filepick input{position:absolute;inset:0;opacity:0;cursor:pointer}.channel-pick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:10px 0}.channel-pick button{border:1px solid #34383c;background:#101214;color:#d5d7da;border-radius:9px;padding:9px;font-weight:800}.channel-pick button.active{border-color:var(--gold);color:#18150c;background:var(--gold)}.section-list{display:grid;gap:9px;margin-top:10px}.wave-section{border:1px solid #30343a;border-radius:12px;background:#0f1112;padding:10px}.wave-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.wave-section-head b{font-size:12px}.mini-btn{border:1px solid #383c41;background:#17191b;color:#ddd;border-radius:8px;padding:6px 8px;font-size:11px}.point-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.point{border:1px solid #2d3034;background:#0b0d0e;border-radius:8px;padding:6px}.point label{display:block;color:var(--muted);font-size:9px;margin-bottom:3px}.point input{width:100%;border:0;background:transparent;color:#fff;outline:none;font-size:13px;padding:2px 0}.wave-status{min-height:18px;margin-top:8px;font-size:11px;color:var(--muted)}.saved-waves{display:grid;gap:6px;margin-top:10px}.saved-wave{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;border:1px solid #30343a;border-radius:10px;padding:8px;background:#0f1112}.saved-wave strong{font-size:12px}.saved-wave small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.touch-wrap{display:grid;gap:10px}.touchpad{height:280px;border-radius:16px;border:1px solid #4b432b;background:linear-gradient(180deg,rgba(231,199,109,.10),rgba(9,10,11,.65)),repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),rgba(255,255,255,.04) 25%),repeating-linear-gradient(0deg,transparent 0,transparent calc(25% - 1px),rgba(255,255,255,.04) 25%);position:relative;touch-action:none;overflow:hidden}.touchpad:before{content:'↑ 强度';position:absolute;left:10px;top:9px;color:#9ea2a7;font-size:10px}.touchpad:after{content:'频率 →';position:absolute;right:10px;bottom:9px;color:#9ea2a7;font-size:10px}.touch-dot{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 7px rgba(231,199,109,.15);transform:translate(-50%,-50%);left:50%;top:85%;pointer-events:none}.touch-readout{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.touch-readout div{border:1px solid #30343a;border-radius:10px;background:#0f1112;padding:8px;text-align:center}.touch-readout b{display:block;font-size:18px}.touch-readout small{color:var(--muted);font-size:9px}.touch-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.touch-options .limitbox{margin:0}.workbench-note{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px}
+
+
+@media(max-width:500px){
+  .app{padding:10px 8px 88px}.top{padding:6px 2px 11px}.logo{width:34px;height:34px}.brand h1{font-size:14px}.brand small{font-size:10px}.card{padding:10px;border-radius:14px;margin-bottom:9px}.title{font-size:12px}.pill{padding:5px 7px;font-size:10px}
+  .room{grid-template-columns:1fr}.room-actions{display:grid;grid-template-columns:1fr}.room-actions:has(.btn:not(.hidden)+.btn:not(.hidden)){grid-template-columns:1fr 1fr}.room-actions .btn{min-width:0;padding:9px 8px;font-size:12px}.input{padding:10px;font-size:14px}
+  .device-grid{gap:7px}.device{padding:9px}.device .value{font-size:27px;margin:7px 0 4px}.device strong{font-size:11px}
+  .hold-grid{grid-template-columns:1fr;gap:8px;margin-top:10px}.channel-control{padding:9px 8px;border-radius:13px}.hold-letter{font-size:13px;white-space:normal;overflow:visible}.channel-main{grid-template-columns:52px minmax(86px,1fr) 52px;gap:7px;margin-top:7px}.hold-step{height:54px;border-radius:11px;font-size:27px}.hold-value b{font-size:31px}.hold-value small{font-size:10px;white-space:normal;text-align:center;line-height:1.25}.hold-tip{font-size:9px;margin-top:5px}.hold-help{font-size:10px;margin-top:7px}
+  .waves{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.wave{min-height:50px;padding:6px 2px}.wave b{font-size:18px}.wave span{font-size:9px}.tabs .tab,.subtab{padding:8px 4px;font-size:11px}
+  .limits{gap:7px}.limitbox{padding:8px}.limitbox input{font-size:17px}.channel-pick button{padding:7px 3px;font-size:10px}.toolrow .btn{padding:8px 9px;font-size:11px}.point-grid{grid-template-columns:repeat(2,1fr)}.touchpad{height:220px}.touch-options{grid-template-columns:1fr 1fr}.touch-readout b{font-size:15px}.estop{height:50px;bottom:10px;width:calc(100% - 16px);border-radius:13px;font-size:12px}
+}
+@media(max-width:360px){
+  .app{padding-left:6px;padding-right:6px}.card{padding:8px}.channel-main{grid-template-columns:46px minmax(72px,1fr) 46px;gap:5px}.hold-step{height:50px;font-size:24px}.hold-value b{font-size:28px}.waves{grid-template-columns:repeat(2,1fr)}.subtabs{gap:3px}.subtab{font-size:10px}.touch-options{grid-template-columns:1fr}.qr{width:min(68vw,210px);height:min(68vw,210px)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><div class="logo">⚡</div><div><h1>CoyoteLink · 郊狼互控</h1></div></div><div id="netDot" class="dot"></div></header>
+
+<section class="card">
+  <div class="row between"><div class="title">双人房间</div><span id="modeState" class="pill">等待连接</span></div>
+  <div class="room"><input id="roomCode" class="input" maxlength="12" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="输入房间号"/><div class="room-actions"><button id="joinBtn" class="btn gold" disabled>加入房间</button><button id="leaveBtn" class="btn danger hidden" type="button" disabled>离开房间</button></div></div>
+  <div id="roomHelp" class="fieldhint">房间号需 8–12 位，仅限英文字母和数字</div>
+  <div class="statusline"><span id="peerState" class="pill">未连接</span><span class="pill">对方设备 <span id="peerDeviceState">无设备</span></span></div>
+</section>
+
+<section class="card">
+  <div class="row between"><div class="title">连接我的郊狼</div><span class="pill"><span id="socketDot" class="dot"></span><span id="socketStateText">未连接</span></span></div>
+  <button id="socketBtn" class="btn gold" type="button" aria-controls="qrWrap" aria-expanded="false" style="width:100%;margin-top:12px">连接设备</button>
+  <div id="qrWrap" class="socketbox hidden">
+    <div class="qrgrid">
+      <div class="qr"><img id="qrImage" alt="DG-LAB Socket 配对二维码" draggable="false"></div>
+      <div>
+        <div class="title">DG-LAB APP 扫码连接</div>
+        <div class="actions"><a id="openDglab" class="btn ghost" href="#">打开连接链接</a></div>
+        <div class="manual-connect">
+          <div class="tiny muted" style="margin-bottom:6px">手动连接地址</div>
+          <input id="manualSocketUrl" class="input" type="text" readonly spellcheck="false" aria-label="Socket 手动连接地址">
+          <div class="actions"><button id="copySocketUrl" class="btn ghost" type="button">复制地址</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="statusline"><span class="pill">本机设备 <span id="localDeviceName">未连接</span></span></div>
+  <div class="device-grid"><div class="device"><strong>A 通道</strong><div class="value" id="localA">0</div></div><div class="device"><strong>B 通道</strong><div class="value" id="localB">0</div></div></div>
+</section>
+
+<section class="card">
+  <div class="row between"><div class="title">允许对方控制我的设备</div><label class="switch"><input id="allowRemote" type="checkbox"><i></i></label></div>
+  <div class="limits"><div class="limitbox"><label>本机 A 通道上限</label><input id="limitA" type="number" min="0" max="200" value="20"></div><div class="limitbox"><label>本机 B 通道上限</label><input id="limitB" type="number" min="0" max="200" value="20"></div></div>
+  <div class="notice">检测到任一方、房间或设备断联时 A/B 归零；突发失联由短时安全租约自动失效。</div>
+</section>
+
+<div class="tabs"><button class="tab active" data-tab="remote">控制对方</button><button class="tab" data-tab="local">本机测试</button></div>
+<section id="controlCard" class="card">
+  <div class="row between"><div><div id="controlTitle" class="title">控制对方设备</div><div id="controlHint" class="muted tiny">等待对方设备与授权</div></div><span id="remotePermission" class="pill">无设备</span></div>
+  <div class="hold-grid">
+    <div class="channel-control" data-ch="A">
+      <div class="hold-letter">A 通道</div>
+      <div class="channel-main">
+        <button id="decA" class="hold-step dec" data-ch="A" data-dir="-1" type="button" aria-label="A 通道减少">−</button>
+        <div class="hold-value"><b id="setA">0</b><small>/ 最大 <span id="peerLimitA">—</span></small></div>
+        <button id="incA" class="hold-step inc" data-ch="A" data-dir="1" type="button" aria-label="A 通道增加">＋</button>
+      </div>
+      <div class="hold-tip">短按 ±1 · 长按连续直控</div>
+    </div>
+    <div class="channel-control" data-ch="B">
+      <div class="hold-letter">B 通道</div>
+      <div class="channel-main">
+        <button id="decB" class="hold-step dec" data-ch="B" data-dir="-1" type="button" aria-label="B 通道减少">−</button>
+        <div class="hold-value"><b id="setB">0</b><small>/ 最大 <span id="peerLimitB">—</span></small></div>
+        <button id="incB" class="hold-step inc" data-ch="B" data-dir="1" type="button" aria-label="B 通道增加">＋</button>
+      </div>
+      <div class="hold-tip">短按 ±1 · 长按连续直控</div>
+    </div>
+  </div>
+  <div class="hold-help">每步直发 ±1 · 长按持续增减 · 急停双方归零</div>
+  <div style="margin-top:14px"><div class="title">波形</div><div class="waves">
+    <button class="wave active" data-wave="extrustion"><b>⌁</b><span>挤压</span></button><button class="wave" data-wave="bubble"><b>◌</b><span>气泡</span></button><button class="wave" data-wave="rhythm"><b>∿</b><span>律动</span></button><button class="wave" data-wave="air"><b>≋</b><span>电波</span></button>
+    <button class="wave" data-wave="dance"><b>〽</b><span>舞步</span></button><button class="wave" data-wave="climb"><b>⌇</b><span>攀登</span></button><button class="wave" data-wave="shade"><b>≈</b><span>树荫</span></button><button class="wave" data-wave="pulse"><b>∧</b><span>脉冲</span></button>
+  </div></div>
+</section>
+
+<section class="card wave-workbench" id="waveWorkbench">
+  <div class="row between"><div><div class="title">波形与触摸控制</div><div class="muted tiny">自定义导入 · 多小节编辑 · 触摸实时控制</div></div><span id="waveWorkbenchState" class="pill">就绪</span></div>
+  <div class="subtabs" style="margin-top:12px"><button class="subtab active" data-wave-tab="library">自定义波形</button><button class="subtab" data-wave-tab="editor">编辑器</button><button class="subtab" data-wave-tab="touch">触摸模式</button></div>
+
+  <div class="wavepanel active" data-wave-panel="library">
+    <div class="toolrow">
+      <label class="btn ghost filepick">导入波形<input id="waveImport" type="file" accept=".json,.txt,.wave,.dglab,text/plain,application/json"></label>
+      <button id="waveExportCurrent" class="btn ghost" type="button">导出当前</button>
+    </div>
+    <div class="channel-pick" id="customApplyChannel"><button data-custom-ch="A">应用 A</button><button data-custom-ch="B">应用 B</button><button class="active" data-custom-ch="AB">应用 AB</button></div>
+    <div id="savedWaves" class="saved-waves"></div>
+    <div class="workbench-note">支持 JSON 或纯文本 16 位 HEX 波形；每个小节代表 100ms，包含 4 组 25ms 的频率/波形强度。自定义波形保存在当前浏览器本地。</div>
+  </div>
+
+  <div class="wavepanel" data-wave-panel="editor">
+    <div class="toolrow"><input id="customWaveName" class="input" maxlength="32" placeholder="自定义波形名称" value="我的波形"><button id="addWaveSection" class="btn ghost" type="button">＋ 添加小节</button></div>
+    <div id="waveSections" class="section-list"></div>
+    <div class="toolrow" style="margin-top:10px"><button id="saveCustomWave" class="btn gold" type="button">保存波形</button><button id="clearWaveSections" class="btn ghost" type="button">清空重建</button></div>
+    <div id="waveEditorStatus" class="wave-status"></div>
+  </div>
+
+  <div class="wavepanel" data-wave-panel="touch">
+    <div class="touch-wrap">
+      <div class="channel-pick" id="touchChannel"><button class="active" data-touch-ch="A">A 通道</button><button data-touch-ch="B">B 通道</button><button data-touch-ch="AB">A+B</button></div>
+      <div class="touch-options"><div class="limitbox"><label>触摸波形力度 0–100</label><input id="touchPulsePower" type="number" min="0" max="100" value="100"></div><div class="limitbox"><label>最高触摸强度比例 %</label><input id="touchMaxPercent" type="number" min="1" max="100" value="100"></div></div>
+      <div id="touchPad" class="touchpad" role="application" aria-label="触摸控制区域"><div id="touchDot" class="touch-dot"></div></div>
+      <div class="touch-readout"><div><b id="touchIntensity">0</b><small>目标强度</small></div><div><b id="touchFreq">125</b><small>波形频率</small></div><div><b id="touchPowerView">100</b><small>波形力度</small></div></div>
+      <div class="workbench-note">按住触摸区才输出：横向控制频率 10–240，纵向控制通道强度；松手/离开/切后台立即结束触摸输出并把触摸通道归零。触摸数据约按郊狼 100ms 周期合并发送。</div>
+    </div>
+  </div>
+</section>
+</div>
+<button id="estop" class="estop">急停 · 双方归零</button>
+<script src="./app.js"></script>
+</body>
+</html>
