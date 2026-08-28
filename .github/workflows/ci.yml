@@ -118,7 +118,7 @@ jobs:
               socket.on('connect', () => {
                 socket.write('G');
                 setImmediate(() => {
-                  socket.end('ET /healthz HTTP/1.1\r\nHost: 127.0.0.1:18991\r\nConnection: close\r\n\r\n');
+                  socket.write('ET /healthz HTTP/1.1\r\nHost: 127.0.0.1:18991\r\nConnection: close\r\n\r\n');
                 });
               });
             });
