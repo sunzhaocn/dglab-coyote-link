@@ -1,9 +1,9 @@
 'use strict';
 
-// v1.0.1 security bootstrap.
+// v1.0.2 security/compatibility bootstrap.
 // The original V4/room implementation is kept in vendor/server-core.js so
 // existing behaviour stays unchanged while this wrapper enforces the web
-// exposure boundary before the core starts.
+// exposure boundary and protects the mixed HTTP/HTTPS TCP multiplexer.
 const fs = require('fs');
 const http = require('http');
 const net = require('net');
@@ -52,10 +52,67 @@ http.ServerResponse.prototype.writeHead = function hardenedWriteHead(...args) {
   return realWriteHead.apply(this, args);
 };
 
-// Do not let an idle TCP client hold the TLS/HTTP protocol-sniffing socket
-// indefinitely. This affects servers created by the core, not outbound sockets.
+// The TLS build exposes one public TCP port for both plaintext HTTP and TLS.
+// vendor/server-core.js consumes the first chunk to decide which loopback
+// endpoint should receive the connection. If additional ClientHello/request
+// chunks arrive before that loopback connection is ready, a flowing socket can
+// otherwise emit and discard those chunks. Android Chrome is particularly good
+// at exposing this race with a larger/fragmented TLS ClientHello.
+//
+// Guard the first `once("data")` handler installed by the raw TCP multiplexer:
+// pause immediately after the discriminator chunk is delivered, keep later
+// bytes buffered by Node, then resume only when the core attaches its upstream
+// pipe. `http.Server` / `https.Server` internals do not use this exported
+// net.createServer wrapper, so this is scoped to the explicit raw mux server.
 const realCreateServer = net.createServer;
 net.createServer = function hardenedCreateServer(...args) {
+  const listenerIndex = args.findIndex(arg => typeof arg === 'function');
+
+  if (listenerIndex >= 0) {
+    const originalConnectionListener = args[listenerIndex];
+
+    args[listenerIndex] = function guardedConnectionListener(socket) {
+      const realOnce = socket.once;
+      let firstDataGuardArmed = true;
+
+      socket.once = function guardedOnce(event, listener) {
+        if (firstDataGuardArmed && event === 'data' && typeof listener === 'function') {
+          firstDataGuardArmed = false;
+          socket.once = realOnce;
+
+          return realOnce.call(socket, 'data', function pausedFirstChunk(...dataArgs) {
+            socket.pause();
+
+            const realPipe = socket.pipe;
+            let pipeGuardArmed = true;
+
+            socket.pipe = function guardedPipe(...pipeArgs) {
+              if (pipeGuardArmed) {
+                pipeGuardArmed = false;
+                socket.pipe = realPipe;
+              }
+              const result = realPipe.apply(this, pipeArgs);
+              socket.resume();
+              return result;
+            };
+
+            try {
+              return listener.apply(this, dataArgs);
+            } catch (error) {
+              socket.pipe = realPipe;
+              socket.resume();
+              throw error;
+            }
+          });
+        }
+
+        return realOnce.call(this, event, listener);
+      };
+
+      return originalConnectionListener.call(this, socket);
+    };
+  }
+
   const server = realCreateServer.apply(net, args);
   server.on('connection', socket => {
     socket.setTimeout(10_000, () => socket.destroy());
