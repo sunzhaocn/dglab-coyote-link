@@ -2,6 +2,15 @@
 
 本项目采用语义化版本号。公开 GitHub 首发从 `v1.0.0` 开始；此前 `v0.x` 为项目迭代阶段版本。
 
+## [1.0.2] - 2026-08-28
+
+### Android Chrome / TLS compatibility
+
+- 修复 SSL 单端口 HTTP/HTTPS 分流中的首包竞态：分流器读取首个判别数据块后立即暂停客户端 socket，在内部 HTTP/HTTPS 上游建立并挂接 pipe 前不再消费后续字节，避免分片 TLS ClientHello 或分片 HTTP 请求在空窗期被丢弃。
+- 保持原有单自定义端口行为不变：HTTPS/WSS 继续直接工作，明文 HTTP 继续在同一端口返回 308 跳转。
+- 增加 TLS 单端口 CI：自签名证书启动、HTTPS `/healthz`、HTTP 308，以及多轮分片请求回归检查。
+- 版本升级到 `1.0.2`。
+
 ## [1.0.1] - 2026-08-28
 
 ### Security / repository hardening
