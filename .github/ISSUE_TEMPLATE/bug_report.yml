@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible CoyoteLink problem
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Please remove room IDs, domains, private keys, credentials and other secrets from logs/screenshots."
+  - type: input
+    id: version
+    attributes:
+      label: CoyoteLink version
+      placeholder: "1.0.1"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser / OS / DG-LAB APP
+      placeholder: "Chrome 151 / Android 16 / DG-LAB APP ..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact sequence that reproduces the issue
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs / screenshots
+      description: Do not include secrets or private keys
