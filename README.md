@@ -1,6 +1,6 @@
 # CoyoteLink · 郊狼互控
 
-[![Release](https://img.shields.io/badge/release-v1.0.0-111111)](https://github.com/sunzhaocn/dglab-coyote-link/releases)
+[![Release](https://img.shields.io/badge/release-v1.0.1-111111)](https://github.com/sunzhaocn/dglab-coyote-link/releases)
 [![Node](https://img.shields.io/badge/Node.js-%3E%3D20-43853d)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
 [![DG-LAB](https://img.shields.io/badge/DG--LAB-Socket%20V4-d6ae55)](OFFICIAL_SOCKET.md)
@@ -140,6 +140,9 @@ powershell -ExecutionPolicy Bypass -File .\deploy.ps1
 
 ## 失联与安全机制
 
+服务端只公开 `index.html`、`app.js` 和明确声明的 API/WebSocket 路径；`server.js`、部署脚本、备份目录以及 `domains/*/ssl/` 中的证书/私钥不会作为静态文件对外提供。
+
+
 CoyoteLink 把“失联后尽快归零”作为核心设计，但任何浏览器/WebSocket/BLE 链路都不能保证零延迟故障检测。
 
 - 房间网页约每 1 秒发送应用层心跳；服务端约 4.5 秒未收到即判定掉线。
@@ -249,4 +252,4 @@ http://127.0.0.1:8787/healthz
 
 Bug、兼容性问题和功能建议欢迎通过 Issues 提交。提交代码前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-版本历史见 [CHANGELOG.md](CHANGELOG.md)。
+版本历史见 [CHANGELOG.md](CHANGELOG.md)。当前维护版本为 **v1.0.1**。

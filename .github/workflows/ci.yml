@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check app.js
+          node --check server.js
+          node --check tls-scan.js
+      - name: Shell syntax
+        run: |
+          bash -n deploy.sh
+          bash -n update.sh
+      - name: Required runtime files
+        run: |
+          test -f vendor/qrcode/index.js
+          test -f vendor/qrcode/LICENSE.txt
+          test -f docs/ARCHITECTURE.md
+          test -f docs/WAVEFORM_FORMAT.md
+      - name: Runtime and static-file security checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p domains/ci.example/ssl
+          printf 'DO-NOT-SERVE' > domains/ci.example/ssl/private.key
+          PORT=18990 HOST=127.0.0.1 node server.js >/tmp/coyotelink-ci.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:18990/healthz > /tmp/health.json; then break; fi
+            sleep 0.25
+          done
+          grep -q '"ok":true' /tmp/health.json
+          grep -q '"version":"1.0.1"' /tmp/health.json
+          curl -fsS http://127.0.0.1:18990/ >/dev/null
+          curl -fsS http://127.0.0.1:18990/app.js >/dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18990/server.js)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18990/package.json)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18990/domains/ci.example/ssl/private.key)" = 404
+          curl -fsS 'http://127.0.0.1:18990/api/qr.png?text=ci' -o /tmp/qr.png
+          test -s /tmp/qr.png

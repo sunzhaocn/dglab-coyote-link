@@ -26,8 +26,14 @@ Never commit the following to Git:
 
 The included `.gitignore` blocks common secret-bearing deployment files, but it cannot prevent every accidental commit.
 
+The HTTP server intentionally uses a static-file allowlist. Source files, deployment scripts, backups and `domains/*/ssl/` are not web-readable routes. If you modify `server.js`, keep this boundary intact and test that `/server.js` and a representative private-key path return `404`.
+
 ## Device-control safety
 
 CoyoteLink contains software fail-safes such as emergency stop, heartbeat timeouts and disconnect handling. These are best-effort controls over browser, WebSocket, APP and device links; they are not a hardware safety system and cannot guarantee zero-latency shutdown under every failure mode.
 
 Test changes at low intensity and keep a physical means of stopping/disconnecting the device available during development.
+
+## v1.0.1 security fix
+
+Versions before v1.0.1 could expose files from the deployment directory through the generic static-file handler. Upgrade to v1.0.1 or later. The server now serves only an explicit public-file allowlist.

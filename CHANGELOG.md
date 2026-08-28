@@ -2,6 +2,15 @@
 
 本项目采用语义化版本号。公开 GitHub 首发从 `v1.0.0` 开始；此前 `v0.x` 为项目迭代阶段版本。
 
+## [1.0.1] - 2026-08-28
+
+### Security / repository hardening
+
+- 修复服务器把整个安装目录当作静态目录的问题；现在仅公开 `index.html`、`app.js` 与明确 API 路径，避免 `server.js`、部署脚本、备份以及 `domains/*/ssl/` 下的 TLS 私钥被 HTTP 直接读取。
+- TLS 同端口协议探测增加 10 秒首字节超时，减少空闲 TCP 连接长期占用。
+- CI 增加完整性校验、QR 生成和敏感静态路径不可访问检查。
+- 补齐 GitHub Actions、Issue 模板、架构/波形文档和 `vendor/qrcode/` 第三方运行文件。
+
 ## [1.0.0] - 2026-08-27
 
 ### Public release
