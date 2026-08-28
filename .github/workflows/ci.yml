@@ -45,7 +45,7 @@ jobs:
             sleep 0.25
           done
           grep -q '"ok":true' /tmp/health.json
-          grep -q '"version":"1.0.1"' /tmp/health.json
+          grep -q '"version":"1.0.2"' /tmp/health.json
           curl -fsS http://127.0.0.1:18990/ >/dev/null
           curl -fsS http://127.0.0.1:18990/app.js >/dev/null
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18990/server.js)" = 404
@@ -53,3 +53,81 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18990/domains/ci.example/ssl/private.key)" = 404
           curl -fsS 'http://127.0.0.1:18990/api/qr.png?text=ci' -o /tmp/qr.png
           test -s /tmp/qr.png
+
+      - name: Single-port TLS mux and fragmentation regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$(mktemp -d)"
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+            -keyout "$work/key.pem" -out "$work/cert.pem" \
+            -subj '/CN=localhost' >/dev/null 2>&1
+
+          PORT=18991 HOST=127.0.0.1 \
+          TLS_CERT_FILE="$work/cert.pem" TLS_KEY_FILE="$work/key.pem" \
+          node server.js >"$work/server.log" 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true; rm -rf "$work"' EXIT
+
+          for i in {1..30}; do
+            if curl -kfsS https://127.0.0.1:18991/healthz >"$work/health.json" 2>/dev/null; then
+              break
+            fi
+            sleep 0.2
+          done
+
+          grep -q '"ok":true' "$work/health.json"
+          grep -q '"version":"1.0.2"' "$work/health.json"
+
+          code="$(curl -sS -o "$work/http-body" -D "$work/http-head" \
+            -w '%{http_code}' http://127.0.0.1:18991/healthz)"
+          test "$code" = 308
+          grep -qi '^location: https://127.0.0.1:18991/healthz' "$work/http-head"
+
+          # Regression invariant: the discriminator chunk pauses the source
+          # until the core attaches its upstream pipe.
+          grep -q 'socket.pause();' server.js
+          grep -q 'socket.resume();' server.js
+
+          # Exercise the same mux with a deliberately split request. This is
+          # protocol-independent: if bytes are lost between discriminator and
+          # upstream attachment, the internal HTTP parser cannot return 308.
+          node <<'NODE'
+          const net = require('net');
+
+          function splitRequest(iteration) {
+            return new Promise((resolve, reject) => {
+              const socket = net.connect({ host: '127.0.0.1', port: 18991 });
+              socket.setNoDelay(true);
+              socket.setTimeout(3000, () => {
+                socket.destroy();
+                reject(new Error(`timeout at iteration ${iteration}`));
+              });
+
+              let response = '';
+              socket.on('data', chunk => { response += chunk.toString('latin1'); });
+              socket.on('error', reject);
+              socket.on('end', () => {
+                if (!/^HTTP\/1\.1 308\b/.test(response)) {
+                  reject(new Error(`bad response at iteration ${iteration}: ${response.slice(0, 120)}`));
+                  return;
+                }
+                resolve();
+              });
+
+              socket.on('connect', () => {
+                socket.write('G');
+                setImmediate(() => {
+                  socket.end('ET /healthz HTTP/1.1\r\nHost: 127.0.0.1:18991\r\nConnection: close\r\n\r\n');
+                });
+              });
+            });
+          }
+
+          (async () => {
+            for (let i = 0; i < 40; i++) await splitRequest(i);
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
