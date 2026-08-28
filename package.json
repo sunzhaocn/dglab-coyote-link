@@ -1,6 +1,6 @@
 {
   "name": "dglab-coyote-link",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "CoyoteLink - unofficial DG-LAB Socket V4 mutual-control web app with rooms, +/-1 intensity control, custom waveforms and touch mode",
   "main": "server.js",
